@@ -5,16 +5,22 @@ plugins {
 
 android {
     namespace = "com.JN.tpkotlinapi"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.JN.tpkotlinapi"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Lecture des clés depuis local.properties
+        val exchangeKey = project.findProperty("EXCHANGE_API_KEY") as String? ?: ""
+        val newsKey = project.findProperty("NEWS_API_KEY") as String? ?: ""
+        buildConfigField("String", "EXCHANGE_API_KEY", "\"$exchangeKey\"")
+        buildConfigField("String", "NEWS_API_KEY", "\"$newsKey\"")
     }
 
     buildTypes {
@@ -37,6 +43,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -61,6 +68,9 @@ dependencies {
 
     // Coil - chargement d'images asynchrone
     implementation("io.coil-kt:coil-compose:2.7.0")
+
+    // Material Icons Extended
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
     // Dépendances de base
     implementation(libs.androidx.core.ktx)

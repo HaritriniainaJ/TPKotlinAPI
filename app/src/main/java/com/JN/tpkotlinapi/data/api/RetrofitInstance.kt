@@ -27,4 +27,24 @@ object RetrofitInstance {
             .build()
             .create(CurrencyApi::class.java)
     }
+
+    // Open-Meteo
+    val weatherApi: WeatherApi by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://api.open-meteo.com/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(WeatherApi::class.java)
+    }
+
+    // NewsAPI
+    val newsApi: NewsApi by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://newsapi.org/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(NewsApi::class.java)
+    }
 }
