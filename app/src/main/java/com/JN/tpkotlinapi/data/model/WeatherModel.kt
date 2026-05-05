@@ -6,7 +6,8 @@ data class WeatherResponse(
     @SerializedName("latitude") val latitude: Double,
     @SerializedName("longitude") val longitude: Double,
     @SerializedName("timezone") val timezone: String,
-    @SerializedName("current_weather") val currentWeather: CurrentWeather
+    @SerializedName("current_weather") val currentWeather: CurrentWeather,
+    @SerializedName("daily") val daily: DailyForecast? = null
 )
 
 data class CurrentWeather(
@@ -17,7 +18,12 @@ data class CurrentWeather(
     @SerializedName("time") val time: String
 )
 
-// Convertit le code WMO en description + emoji
+data class DailyForecast(
+    @SerializedName("time") val time: List<String>,
+    @SerializedName("temperature_2m_max") val tempMax: List<Double>,
+    @SerializedName("temperature_2m_min") val tempMin: List<Double>
+)
+
 fun weatherCodeToInfo(code: Int): Pair<String, String> = when (code) {
     0 -> "Ciel dégagé" to "☀️"
     in 1..3 -> "Partiellement nuageux" to "⛅"

@@ -3,6 +3,8 @@ package com.JN.tpkotlinapi.ui.currency
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,8 +19,8 @@ fun CurrencyScreen(vm: CurrencyViewModel = viewModel()) {
 
     val state by vm.uiState.collectAsState()
     val base by vm.base.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
 
-    // Devises importantes a afficher en priorite
     val priorityCurrencies = listOf(
         "EUR", "GBP", "JPY", "CHF", "CAD", "AUD", "MGA", "ZAR", "CNY", "INR"
     )
@@ -38,11 +40,23 @@ fun CurrencyScreen(vm: CurrencyViewModel = viewModel()) {
                 .fillMaxSize()
                 .padding(padding)
         ) {
+            // Champ de recherche
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it.uppercase() },
+                placeholder = { Text("Rechercher une devise (ex: EUR)") },
+                leadingIcon = { Icon(Icons.Default.Search, null) },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+
             // Selecteur devise de base
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listOf("USD", "EUR", "GBP").forEach { currency ->
@@ -84,16 +98,25 @@ fun CurrencyScreen(vm: CurrencyViewModel = viewModel()) {
                     val data = (state as UiState.Success).data
                     val rates = data.conversionRates
 
+                    // Filtrage par recherche
+                    val filtered = rates.entries.filter {
+                        it.key.contains(searchQuery, ignoreCase = true)
+                    }
+
                     // Devises prioritaires d'abord, puis reste alphabetique
-                    val sorted = (
-                            priorityCurrencies.mapNotNull { code ->
-                                rates[code]?.let { code to it }
-                            } +
-                                    rates.entries
-                                        .filter { it.key !in priorityCurrencies }
-                                        .sortedBy { it.key }
-                                        .map { it.key to it.value }
-                            )
+                    val sorted = if (searchQuery.isEmpty()) {
+                        (
+                                priorityCurrencies.mapNotNull { code ->
+                                    rates[code]?.let { code to it }
+                                } +
+                                        rates.entries
+                                            .filter { it.key !in priorityCurrencies }
+                                            .sortedBy { it.key }
+                                            .map { it.key to it.value }
+                                )
+                    } else {
+                        filtered.sortedBy { it.key }.map { it.key to it.value }
+                    }
 
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
@@ -112,7 +135,7 @@ fun CurrencyScreen(vm: CurrencyViewModel = viewModel()) {
                                 code = code,
                                 rate = rate,
                                 base = base,
-                                isPriority = code in priorityCurrencies
+                                isPriority = code in priorityCurrencies && searchQuery.isEmpty()
                             )
                         }
                     }
@@ -140,10 +163,7 @@ fun CurrencyRow(
     ) {
         ListItem(
             headlineContent = {
-                Text(
-                    code,
-                    style = MaterialTheme.typography.titleSmall
-                )
+                Text(code, style = MaterialTheme.typography.titleSmall)
             },
             trailingContent = {
                 Text(

@@ -10,6 +10,7 @@ interface WeatherApi {
         @Query("latitude") lat: Double,
         @Query("longitude") lon: Double,
         @Query("current_weather") currentWeather: Boolean = true,
-        @Query("timezone") timezone: String = "auto"
+        @Query("timezone") timezone: String = "auto",
+        @Query("daily") daily: String = "temperature_2m_max,temperature_2m_min"
     ): WeatherResponse
 }

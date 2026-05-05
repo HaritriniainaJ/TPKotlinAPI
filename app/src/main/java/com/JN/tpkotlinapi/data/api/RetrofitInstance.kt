@@ -47,4 +47,13 @@ object RetrofitInstance {
             .build()
             .create(NewsApi::class.java)
     }
+
+    val cryptoApi: CryptoApi by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://api.coingecko.com/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(CryptoApi::class.java)
+    }
 }
