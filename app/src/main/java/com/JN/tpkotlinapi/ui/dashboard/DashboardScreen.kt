@@ -3,8 +3,9 @@ package com.JN.tpkotlinapi.ui.dashboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,32 +20,41 @@ fun DashboardScreen(vm: DashboardViewModel = viewModel()) {
     val newsState by vm.newsState.collectAsState()
     val cryptoState by vm.cryptoState.collectAsState()
 
+    val isRefreshing = currencyState is UiState.Loading ||
+            weatherState is UiState.Loading ||
+            newsState is UiState.Loading ||
+            cryptoState is UiState.Loading
+
+    val pullToRefreshState = rememberPullToRefreshState()
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Tableau de bord") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                actions = {
-                    TextButton(onClick = { vm.loadAll() }) {
-                        Text("Actualiser")
-                    }
-                }
+                )
             )
         }
     ) { padding ->
-        LazyColumn(
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { vm.loadAll() },
+            state = pullToRefreshState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(padding)
         ) {
-            item { CurrencyCard(currencyState) }
-            item { WeatherCard(weatherState) }
-            item { CryptoCard(cryptoState) }
-            item { NewsCard(newsState) }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item { CurrencyCard(currencyState) }
+                item { WeatherCard(weatherState) }
+                item { CryptoCard(cryptoState) }
+                item { NewsCard(newsState) }
+            }
         }
     }
 }
