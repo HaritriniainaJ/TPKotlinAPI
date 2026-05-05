@@ -28,26 +28,26 @@ class MainActivity : ComponentActivity() {
         setContent {
             TPKotlinAPITheme {
                 val navController = rememberNavController()
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
+                val currentRoute by navController.currentBackStackEntryAsState()
+                val activeRoute = currentRoute?.destination?.route
 
                 Scaffold(
                     bottomBar = {
                         NavigationBar {
                             NavigationBarItem(
-                                selected = currentRoute == "currency",
+                                selected = activeRoute == "currency",
                                 onClick = { navController.navigate("currency") },
                                 icon = { Icon(Icons.Default.AttachMoney, null) },
                                 label = { Text("Devises") }
                             )
                             NavigationBarItem(
-                                selected = currentRoute == "weather",
+                                selected = activeRoute == "weather",
                                 onClick = { navController.navigate("weather") },
                                 icon = { Icon(Icons.Default.WbSunny, null) },
-                                label = { Text("Meteo") }
+                                label = { Text("Météo") }
                             )
                             NavigationBarItem(
-                                selected = currentRoute == "news",
+                                selected = activeRoute == "news",
                                 onClick = { navController.navigate("news") },
                                 icon = { Icon(Icons.AutoMirrored.Filled.Article, null) },
                                 label = { Text("News") }
